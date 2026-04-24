@@ -3,60 +3,76 @@ import { Link } from "react-router"
 
 const TransactionsList = ({transactions, deleteTransaction}) => {
 
-    const [filteredTransactions, setFilteredTransactions] = useState(transactions)
-
     const [category, setCategory] = useState("")
+    const [type, setType] = useState("")
 
-    const filterType = (filterBy) => {
-        if (filterBy === "all") {
-            setFilteredTransactions(transactions)
+    const getFilteredTransactions = () => {
+        if (category !== "") {
+            return filterCategory(category)
+        } else if (type !== "") {
+            return filterType(type)
+        } else {
+            return transactions
+        }
+    }
+
+    const filterType = (type) => {
+        
+        if ((type === "") || (type === "all")) {
+            return transactions
         } else {
             const tempTransactions = transactions.filter((transaction) => {
-                return transaction.type === filterBy
+                return transaction.type === type
+                console.log()
             })
-            setFilteredTransactions(tempTransactions)
+            return tempTransactions
         }
     }
 
     const filterCategory = (filterBy) => {
+        
         if (filterBy === "") {
-            setFilteredTransactions(transactions)
+            return transactions
         } else {
             const tempTransactions = transactions.filter((transaction) => {
                 return transaction.category === filterBy
             })
-            setFilteredTransactions(tempTransactions)
+            return tempTransactions
         }
     }
 
-    const handleSubmit = (event) => {
-        event.preventDefault()
-        setCategory(category)
-        filterCategory(category)
-    }
+    let filteredTransactions = getFilteredTransactions()
 
   return (
     <>
         <h2>Transaction List</h2>
-
-        <h3>Filter By Type: </h3>
-        <button onClick={() => filterType("expense")}>Expenses</button>
-        <button onClick={() => filterType("income")}>Income</button>
-        <button onClick={() => filterType("all")}>All</button>
-
-        <h3>Filter by Category: </h3>
-        <form onSubmit={handleSubmit}>
+        <hr/>
+        <h3>Filter Transactions:</h3>
+        <form>
             <div>
-                <label>Category: </label>
+                <label>Enter Category to Filter By: </label>
                 <input 
                     type="text"
                     value={category}
                     onChange={(event) => setCategory(event.target.value)}
-                /> 
-            <button>Filter</button>
+                />
+            </div>
+            <h4>OR:</h4>
+            <div>
+                <label>Select Type to Filter By: </label>
+                <select
+                    name="type"
+                    value={type}
+                    onChange={(event) => setType(event.target.value)}
+                >
+                    <option value="">Select an option</option>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                    <option value="all">All</option>
+                </select>
             </div>
         </form>
-        
+        <hr/>
         <ol>
             {filteredTransactions.map((transaction) => (
                 <li key={transaction.id}>
